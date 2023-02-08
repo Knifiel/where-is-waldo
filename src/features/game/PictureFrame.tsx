@@ -1,6 +1,16 @@
 import CharSelector from './CharSelector'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { firestore } from '../../firebase/firebaseConfig'
+import {
+  addDoc,
+  collection,
+  getDoc,
+  getDocs,
+  query,
+  where,
+} from '@firebase/firestore'
+
 type pictureFrameProps = {
   imageURL: string
 }
@@ -50,14 +60,6 @@ const Flag = styled.div<any>`
   width: 10px;
   pointer-events: none;
 `
-const getMeta = (url: string) =>
-  new Promise((resolve, reject) => {
-    const img = new Image()
-    img.onload = () => resolve(img)
-    img.onerror = (err) => reject(err)
-    img.src = url
-  })
-
 export const PictureFrame = (props: pictureFrameProps) => {
   const [coords, setCoords] = useState({ x: 0, y: 0 })
   const [visibity, setVisibity] = useState('hidden')
@@ -66,9 +68,10 @@ export const PictureFrame = (props: pictureFrameProps) => {
   const [dropdownCoords, setDropdownCoords] = useState({ x: 0, y: 0 })
   const [foundCharacters, setFoundCharacters] = useState([] as charType[])
   const [charsToFind, setcharsToFind] = useState([
-    'psyduck',
-    'eevee',
     'alakazam',
+    'charizard',
+    'eevee',
+    'psyduck',
   ] as string[])
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
@@ -76,8 +79,16 @@ export const PictureFrame = (props: pictureFrameProps) => {
   })
 
   useEffect(() => {
-    async function getImageData() {
-      const img: HTMLImageElement | unknown = await getMeta(props.imageURL)
+    async function getMeta(url: string) {
+      return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(img)
+        img.onerror = (err) => reject(err)
+        img.src = url
+      })
+    }
+    async function getImageData(URL: string) {
+      const img: HTMLImageElement | unknown = await getMeta(URL)
       if (img instanceof HTMLImageElement) {
         setImageDimensions({
           width: img.naturalWidth,
@@ -85,10 +96,12 @@ export const PictureFrame = (props: pictureFrameProps) => {
         })
       }
     }
-    getImageData()
-
-    async function getCharactersToFind() {}
-  }, [props.imageURL])
+    try {
+      getImageData(props.imageURL)
+    } catch (e) {
+      console.log(e)
+    }
+  }, [])
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (dropdownIsOpen) {
@@ -110,20 +123,31 @@ export const PictureFrame = (props: pictureFrameProps) => {
       y: e.clientY - 50,
     })
   }
-  const handleDropdownClick = (character: String) => {
+  const handleDropdownClick = async (character: String) => {
     setDropdownIsOpen(false)
     if (character === 'none') {
       return
     }
-    const backendCallString = `x_${clickCoords.x}_y_${clickCoords.y}_ch_${character}`
-    console.log(backendCallString)
     const char = {
       name: character,
       x: clickCoords.x,
       y: clickCoords.y,
     }
-    //TODO: backend call and comparison function
-    const guessIsRight = true
+
+    const q = query(
+      collection(firestore, 'pokemon'),
+      where('name', '==', char.name)
+    )
+    let guessIsRight = false
+    const querySnapshot = await getDocs(q)
+    querySnapshot.forEach((doc) => {
+      const pokemon = doc.data()
+      const deltaX = pokemon.x - char.x
+      const deltaY = pokemon.y - char.y
+      console.log('click at:', char)
+      console.log(pokemon)
+      console.log(deltaX, deltaY)
+    })
 
     if (guessIsRight) {
       setFoundCharacters([...foundCharacters, char])
@@ -156,6 +180,7 @@ export const PictureFrame = (props: pictureFrameProps) => {
           visibility={visibity}
         />
       )}
+
       {foundCharacters.map((character, index) => (
         <Flag
           key={index}

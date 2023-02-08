@@ -15,7 +15,7 @@ function Element(props: any) {
   return (
     <div className={props.className}>
       <h1>Welcome to 'Where is the pokemon?</h1>
-      <p>Your aim is to find those three pokemons on the picture:</p>
+      <p>Your aim is to find those four pokemons on the picture.</p>
       <section>TODO: Put sprites of pokemon here</section>
       <p>
         Click <Link to='/game'>Play</Link> to start, click{' '}
