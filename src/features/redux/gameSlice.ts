@@ -9,11 +9,13 @@ interface GameState {
     y: number
   }
 
+  guessState: 'none' | 'correct' | 'wrong' | 'loading'
+
   charactersToFind: string[]
 
   foundCharacters: characterPosition[]
 
-  isLoading: boolean
+  gameState: 'notStarted' | 'inProgress' | 'finished'
 }
 
 const initialState: GameState = {
@@ -23,7 +25,8 @@ const initialState: GameState = {
   },
   charactersToFind: ['alakazam', 'charizard', 'eevee', 'psyduck'],
   foundCharacters: [],
-  isLoading: false,
+  guessState: 'none',
+  gameState: 'notStarted',
 }
 
 export const gameStateSlice = createSlice({
@@ -37,17 +40,33 @@ export const gameStateSlice = createSlice({
       }
     },
 
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload
+    setGuessState: (
+      state,
+      action: PayloadAction<'none' | 'correct' | 'wrong' | 'loading'>
+    ) => {
+      state.guessState = action.payload
     },
     characterFound: (state, action: PayloadAction<characterPosition>) => {
       state.foundCharacters.push(action.payload)
-      state.charactersToFind.filter((x) => x !== action.payload.name)
+      state.charactersToFind = state.charactersToFind.filter(
+        (name) => name !== String(action.payload.name)
+      )
+    },
+    setGameState: (
+      state,
+      action: PayloadAction<'notStarted' | 'inProgress' | 'finished'>
+    ) => {
+      state.gameState = action.payload
     },
     reset: () => initialState,
   },
 })
 
-export const { setClickCoords, setIsLoading, characterFound, reset } =
-  gameStateSlice.actions
+export const {
+  setClickCoords,
+  setGuessState,
+  setGameState,
+  characterFound,
+  reset,
+} = gameStateSlice.actions
 export default gameStateSlice.reducer

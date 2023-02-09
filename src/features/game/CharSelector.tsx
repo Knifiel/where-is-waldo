@@ -8,14 +8,12 @@ type DropdownProps = {
   charlist: String[]
 }
 
-const CharSelector = styled(Element)`
-  position: fixed;
+const StyledDiv = styled.div`
+  position: absolute;
   z-index: 2;
-  top: ${(props) => props.y}px;
-  left: ${(props) => props.x + 50}px;
-  background-color: white;
-  border: 1px solid gray;
-  border-radius: 5px;
+  background-color: ${(props) => props.theme.bg};
+  border: ${(props) => props.theme.bf};
+  border-radius: ${(props) => props.theme.bgRad};
   padding: 0.2em;
   pointer-events: none;
   & ul {
@@ -40,9 +38,13 @@ const CharSelector = styled(Element)`
   }
 `
 
-function Element(props: DropdownProps) {
+function CharSelector(props: DropdownProps) {
   return (
-    <div className={props.className}>
+    <StyledDiv
+      style={{
+        top: `${props.y}px`,
+        left: `${props.x}px`,
+      }}>
       Chose character:
       <ul>
         {props.charlist.map((character, index) => (
@@ -54,7 +56,7 @@ function Element(props: DropdownProps) {
         ))}
       </ul>
       <div onClick={() => props.handleDropdownClick('none')}></div>
-    </div>
+    </StyledDiv>
   )
 }
 

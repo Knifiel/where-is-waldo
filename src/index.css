@@ -11,14 +11,12 @@
   color: black;
   margin: 0;
   padding: 0;
-
-  --light-slate-gray: #8291a2ff;
-  --jet: #353535ff;
-  --yellow-orange: #f4ac45ff;
-  --eton-blue: #86cb92ff;
-  --imperial-red: #f71735ff;
-
-  background-color: var(--light-slate-gray);
-  color: var(--jet);
-  border-color: var(--imperial-red);
+  height: 100vh;
+  background: rgb(93, 186, 220);
+  background: linear-gradient(
+    180deg,
+    rgba(93, 186, 220, 1) 0%,
+    rgba(51, 113, 76, 1) 49%,
+    rgba(219, 200, 167, 1) 100%
+  );
 }

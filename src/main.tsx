@@ -14,6 +14,8 @@ import { StyledNavbar } from './routes/Navbar'
 import { StyledNotFound } from './routes/NotFound'
 import Welcome from './routes/Welcome'
 import Game from './routes/Game'
+import { ThemeProvider } from 'styled-components'
+import { theme } from './theme'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -47,7 +49,9 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <ThemeProvider theme={theme}>
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </Provider>
   </React.StrictMode>
 )
