@@ -1,10 +1,11 @@
-import React from 'react'
-import { PictureFrame } from '../features/game/PictureFrame'
+import React, { useEffect } from 'react'
+import { GameScreen } from '../features/game/GameScreen'
 import image from '../assets/pokemon.jpg'
 import styled from 'styled-components'
 import GuessPopup from '../features/game/GuessPopup'
-import { useAppSelector } from '../features/redux/hooks'
-import Instructions from '../features/game/Instructions'
+import { useAppSelector } from '../redux/hooks'
+import { Timer } from '../features/game/Timer'
+import GameEnd from '../features/game/GameEnd'
 
 const Game = styled(Element)`
   display: flex;
@@ -17,9 +18,10 @@ function Element(props: any) {
   return (
     <>
       <div className={props.className}>
-        {gameState === 'notStarted' && <Instructions />}
-        {gameState === 'inProgress' && <PictureFrame imageURL={image} />}
-        {gameState === 'finished' && <ScoreSubmit />}
+        <Timer />
+        <GameScreen imageURL={image} />
+
+        {gameState === 'finished' && <GameEnd />}
         <p>
           Picture by{' '}
           <a href='https://www.instagram.com/n.a.y.t.h/'>n.a.y.t.h</a>

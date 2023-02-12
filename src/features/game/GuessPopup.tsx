@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import styled, { keyframes } from 'styled-components'
-import { useAppSelector } from '../redux/hooks'
+import { useAppSelector } from '../../redux/hooks'
 
 const appearAnimation = keyframes`
   0% {opacity: 0}

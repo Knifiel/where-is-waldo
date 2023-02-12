@@ -1,16 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useAppDispatch } from '../redux/hooks'
-import { setGameState } from '../redux/gameSlice'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks'
+import { reset, setGameState } from '../../redux/gameSlice'
 import alakazam from '../../assets/alakazam.png'
 import charizard from '../../assets/charizard.png'
 import eevee from '../../assets/eevee.png'
 import psyduck from '../../assets/psyduck.png'
+import { useNavigate } from 'react-router-dom'
 
 const StyledDiv = styled.div`
   display: flex;
   flex-direction: column;
   place-items: center;
+  gap: 0.2em;
   & .pokemonsContainer {
     display: flex;
     place-content: center;
@@ -42,14 +44,26 @@ const StyledButton = styled.button`
 
 function Instructions() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const gameState = useAppSelector((state) => state.game.gameState)
   const handleStart = () => {
-    dispatch(setGameState('inProgress'))
+    if (gameState === 'notStarted' || gameState === 'finished') {
+      dispatch(reset())
+      dispatch(setGameState('inProgress'))
+      navigate('/game')
+    } else {
+      navigate('/game')
+    }
   }
-
+  const handleRestart = () => {
+    dispatch(reset())
+    dispatch(setGameState('inProgress'))
+    navigate('/game')
+  }
   return (
     <StyledDiv>
-      You will need to find following pokemon on the picrute after clicking
-      "Start" button:
+      <h3>Welcome!</h3>
+      <p>You aim is to find those pokemon on the picture:</p>
       <div className='pokemonsContainer'>
         <ImgContainer>
           Alakazam
@@ -68,7 +82,14 @@ function Instructions() {
           <StyledImg src={psyduck} />
         </ImgContainer>
       </div>
-      <StyledButton onClick={handleStart}>Start</StyledButton>
+      <StyledButton onClick={handleStart}>
+        {gameState === 'notStarted' || gameState === 'finished'
+          ? `Start`
+          : gameState === 'inProgress' && `Return`}
+      </StyledButton>
+      {gameState === 'inProgress' && (
+        <StyledButton onClick={handleRestart}>Restart</StyledButton>
+      )}
     </StyledDiv>
   )
 }

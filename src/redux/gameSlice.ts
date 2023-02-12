@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from './store'
-import type { characterPosition } from '../../types'
+import type { characterPosition } from '../types'
 
 interface GameState {
   clickCoords: {
@@ -16,6 +16,9 @@ interface GameState {
   foundCharacters: characterPosition[]
 
   gameState: 'notStarted' | 'inProgress' | 'finished'
+
+  currentTime: number
+  startTime: number
 }
 
 const initialState: GameState = {
@@ -27,6 +30,8 @@ const initialState: GameState = {
   foundCharacters: [],
   guessState: 'none',
   gameState: 'notStarted',
+  currentTime: 0,
+  startTime: 0,
 }
 
 export const gameStateSlice = createSlice({
@@ -58,7 +63,13 @@ export const gameStateSlice = createSlice({
     ) => {
       state.gameState = action.payload
     },
-    reset: () => initialState,
+    setTime: (state, action: PayloadAction<number>) => {
+      state.currentTime = action.payload
+    },
+    setStartTime: (state, action: PayloadAction<number>) => {
+      state.startTime = action.payload
+    },
+    reset: (state) => (state = initialState),
   },
 })
 
@@ -67,6 +78,8 @@ export const {
   setGuessState,
   setGameState,
   characterFound,
+  setTime,
+  setStartTime,
   reset,
 } = gameStateSlice.actions
 export default gameStateSlice.reducer

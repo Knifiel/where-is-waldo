@@ -12,8 +12,8 @@ const StyledDiv = styled.div`
   position: absolute;
   z-index: 2;
   background-color: ${(props) => props.theme.bg};
-  border: ${(props) => props.theme.bf};
-  border-radius: ${(props) => props.theme.bgRad};
+  border: ${(props) => props.theme.bd};
+  border-radius: ${(props) => props.theme.bdRad};
   padding: 0.2em;
   pointer-events: none;
   & ul {
@@ -45,7 +45,7 @@ function CharSelector(props: DropdownProps) {
         top: `${props.y}px`,
         left: `${props.x}px`,
       }}>
-      Chose character:
+      Chose pokemon:
       <ul>
         {props.charlist.map((character, index) => (
           <li

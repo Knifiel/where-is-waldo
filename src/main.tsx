@@ -9,26 +9,21 @@ import {
 } from 'react-router-dom'
 import './index.css'
 import { Provider } from 'react-redux'
-import store from './features/redux/store'
-import { StyledNavbar } from './routes/Navbar'
+import store from './redux/store'
 import { StyledNotFound } from './routes/NotFound'
-import Welcome from './routes/Welcome'
 import Game from './routes/Game'
 import { ThemeProvider } from 'styled-components'
 import { theme } from './theme'
+import Root from './routes/Root'
+import Highscores from './features/highscores/Highscores'
+import Instructions from './features/instructions/Instructions'
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route
-      element={
-        <>
-          <StyledNavbar />
-          <Outlet />
-        </>
-      }>
+    <Route element={<Root />}>
       <Route
         path='/'
-        element={<Welcome />}
+        element={<Instructions />}
       />
       <Route
         path='/game'
@@ -36,7 +31,7 @@ const router = createBrowserRouter(
       />
       <Route
         path='/highscores'
-        element={<div>Highscores</div>}
+        element={<Highscores />}
       />
       <Route
         path='*'

@@ -1,8 +1,8 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
-export const StyledNavbar = styled(Navbar)`
+export const StyledNavbar = styled.nav`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fit, 100px);
@@ -24,11 +24,11 @@ export const StyledNavbar = styled(Navbar)`
 
 function Navbar(props: any) {
   return (
-    <nav className={`${props.className} navbar`}>
+    <StyledNavbar className={`${props.className} navbar`}>
       <NavLink to='/'>How to play</NavLink>
-      <NavLink to='/game'>Play</NavLink>
+      <NavLink to='/game'>Game</NavLink>
       <NavLink to='/highscores'>Highscores</NavLink>
-    </nav>
+    </StyledNavbar>
   )
 }
 export default Navbar

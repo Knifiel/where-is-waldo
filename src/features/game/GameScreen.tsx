@@ -1,23 +1,16 @@
 import CharSelector from './CharSelector'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { firestore } from '../../firebase/firebaseConfig'
-import {
-  addDoc,
-  collection,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from '@firebase/firestore'
-import { useAppDispatch, useAppSelector } from '../redux/hooks'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import {
   characterFound,
   setClickCoords,
+  setGameState,
   setGuessState,
-} from '../redux/gameSlice'
+} from '../../redux/gameSlice'
+import { getPokemon } from '../../firebase/apiCalls'
 
-type pictureFrameProps = {
+type gameScreenProps = {
   imageURL: string
 }
 type RecticleProp = {
@@ -25,8 +18,6 @@ type RecticleProp = {
 }
 type RootProps = {
   showMouse: boolean
-  imageWidth: number
-  imageHeight: number
 }
 
 const RecticleDiv = styled.div<RecticleProp>`
@@ -41,10 +32,10 @@ const RecticleDiv = styled.div<RecticleProp>`
 `
 const RootDiv = styled.div<RootProps>`
   position: relative;
-  width: ${(props) => props.imageWidth}px;
-  height: ${(props) => props.imageHeight}px;
-  max-width: ${(props) => props.imageWidth}px;
-  max-height: ${(props) => props.imageHeight}px;
+  width: 1500px;
+  height: 1061px;
+  max-width: 1500px;
+  max-height: 1061px;
   &:hover {
     cursor: ${(props) => (props.showMouse ? 'normal' : 'none')};
   }
@@ -61,55 +52,26 @@ const Flag = styled.div<any>`
   width: 100px;
   pointer-events: none;
 `
-export const PictureFrame = (props: pictureFrameProps) => {
+export const GameScreen = (props: gameScreenProps) => {
   const [coords, setCoords] = useState({ x: 0, y: 0 })
   const [visibity, setVisibity] = useState('hidden')
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false)
-  const [imageDimensions, setImageDimensions] = useState({
-    width: 0,
-    height: 0,
-  })
+
   const dispatch = useAppDispatch()
+
   const clickCoords = useAppSelector((state) => state.game.clickCoords)
   const foundCharacters = useAppSelector((state) => state.game.foundCharacters)
   const charsToFind = useAppSelector((state) => state.game.charactersToFind)
-  const guessState = useAppSelector((state) => state.game.guessState)
-
-  useEffect(() => {
-    async function getMeta(url: string) {
-      return new Promise((resolve, reject) => {
-        const img = new Image()
-        img.onload = () => resolve(img)
-        img.onerror = (err) => reject(err)
-        img.src = url
-      })
-    }
-    async function getImageData(URL: string) {
-      const img: HTMLImageElement | unknown = await getMeta(URL)
-      if (img instanceof HTMLImageElement) {
-        setImageDimensions({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-        })
-      }
-    }
-    try {
-      getImageData(props.imageURL)
-    } catch (e) {
-      console.log(e)
-    }
-  }, [])
+  const gameState = useAppSelector((state) => state.game.gameState)
 
   useEffect(() => {
     if (charsToFind.length === 0) {
-      console.log('game end')
+      dispatch(setGameState('finished'))
     }
   }, [charsToFind])
 
-  const handleClick = async (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-  ) => {
-    if (dropdownIsOpen) {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (dropdownIsOpen || charsToFind.length === 0) {
       return
     }
     const rect = e.currentTarget.getBoundingClientRect()
@@ -131,46 +93,62 @@ export const PictureFrame = (props: pictureFrameProps) => {
 
   const handleDropdownClick = async (character: String) => {
     setDropdownIsOpen(false)
-    dispatch(setGuessState('loading'))
     if (character === 'none') {
       return
     }
-    const char = {
-      name: character,
-      x: clickCoords.x,
-      y: clickCoords.y,
-    }
 
-    const q = query(
-      collection(firestore, 'pokemon'),
-      where('name', '==', char.name)
-    )
-    const querySnapshot = await getDocs(q)
-    querySnapshot.forEach((doc) => {
-      const pokemon = doc.data()
-      const deltaX = Math.abs(pokemon.x - char.x)
-      const deltaY = Math.abs(pokemon.y - char.y)
-      if (deltaX < 51 && deltaY < 51) {
-        dispatch(
-          characterFound({ name: pokemon.name, x: pokemon.x, y: pokemon.y })
-        )
-        dispatch(setGuessState('correct'))
-      } else {
-        dispatch(setGuessState('wrong'))
+    try {
+      const char = {
+        name: character,
+        x: clickCoords.x,
+        y: clickCoords.y,
       }
-    })
+
+      dispatch(setGuessState('loading'))
+      const pokemonData = await getPokemon(char.name)
+      pokemonData.forEach((doc) => {
+        const pokemon = doc.data()
+        const deltaX = Math.abs(pokemon.x - char.x)
+        const deltaY = Math.abs(pokemon.y - char.y)
+        if (deltaX < 51 && deltaY < 51) {
+          dispatch(
+            characterFound({ name: pokemon.name, x: pokemon.x, y: pokemon.y })
+          )
+          dispatch(setGuessState('correct'))
+        } else {
+          dispatch(setGuessState('wrong'))
+        }
+      })
+    } catch (e) {
+      dispatch(setGuessState('none'))
+      console.error(e)
+    }
+  }
+
+  const handleVisibility = (e: React.BaseSyntheticEvent) => {
+    if (e.type === 'mouseleave' || gameState === 'finished') {
+      setVisibity('hidden')
+    } else {
+      setVisibity('normal')
+    }
+  }
+  const handleMouse = () => {
+    if (gameState !== 'inProgress' || dropdownIsOpen) {
+      return true
+    }
+    return false
   }
 
   return (
     <>
       <RootDiv
         onMouseUp={(e) => handleClick(e)}
-        onMouseMove={(e) => drawTargetRecticle(e)}
-        onMouseEnter={() => setVisibity('visible')}
-        onMouseLeave={() => setVisibity('hidden')}
-        imageHeight={imageDimensions.height}
-        imageWidth={imageDimensions.width}
-        showMouse={dropdownIsOpen}>
+        onMouseMove={(e) => {
+          drawTargetRecticle(e)
+          handleVisibility(e)
+        }}
+        onMouseLeave={(e) => handleVisibility(e)}
+        showMouse={handleMouse()}>
         <img src={props.imageURL}></img>
         {dropdownIsOpen ? (
           <CharSelector
@@ -180,10 +158,12 @@ export const PictureFrame = (props: pictureFrameProps) => {
             charlist={charsToFind}
           />
         ) : (
-          <RecticleDiv
-            style={{ top: `${coords.y}px`, left: `${coords.x}px` }}
-            visibility={visibity}
-          />
+          gameState !== 'finished' && (
+            <RecticleDiv
+              style={{ top: `${coords.y}px`, left: `${coords.x}px` }}
+              visibility={visibity}
+            />
+          )
         )}
 
         {foundCharacters.map((character, index) => (
