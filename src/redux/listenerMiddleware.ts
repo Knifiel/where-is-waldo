@@ -12,10 +12,3 @@ listenerMiddleware.startListening({
     }
   },
 })
-// listenerMiddleware.startListening({
-//   actionCreator: reset,
-//   effect: (action, listenerApi) => {
-//     const time = Date.now()
-//     listenerApi.dispatch(setStartTime(time))
-//   },
-// })

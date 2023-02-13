@@ -1,11 +1,6 @@
-import React from 'react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
 import { reset, setGameState } from '../../redux/gameSlice'
-import alakazam from '../../assets/alakazam.png'
-import charizard from '../../assets/charizard.png'
-import eevee from '../../assets/eevee.png'
-import psyduck from '../../assets/psyduck.png'
 import { useNavigate } from 'react-router-dom'
 
 const StyledDiv = styled.div`
@@ -46,6 +41,7 @@ function Instructions() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const gameState = useAppSelector((state) => state.game.gameState)
+
   const handleStart = () => {
     if (gameState === 'notStarted' || gameState === 'finished') {
       dispatch(reset())
@@ -60,6 +56,7 @@ function Instructions() {
     dispatch(setGameState('inProgress'))
     navigate('/game')
   }
+
   return (
     <StyledDiv>
       <h3>Welcome!</h3>
@@ -67,19 +64,19 @@ function Instructions() {
       <div className='pokemonsContainer'>
         <ImgContainer>
           Alakazam
-          <StyledImg src={alakazam} />
+          <StyledImg src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png' />
         </ImgContainer>
         <ImgContainer>
           Eevee
-          <StyledImg src={eevee} />
+          <StyledImg src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png' />
         </ImgContainer>
         <ImgContainer>
           Charizard
-          <StyledImg src={charizard} />
+          <StyledImg src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png' />
         </ImgContainer>
         <ImgContainer>
           Psyduck
-          <StyledImg src={psyduck} />
+          <StyledImg src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png' />
         </ImgContainer>
       </div>
       <StyledButton onClick={handleStart}>

@@ -9,10 +9,8 @@ import {
   setGuessState,
 } from '../../redux/gameSlice'
 import { getPokemon } from '../../firebase/apiCalls'
+const imageUrl = new URL('../../assets/pokemon.jpg', import.meta.url).href
 
-type gameScreenProps = {
-  imageURL: string
-}
 type RecticleProp = {
   visibility: string
 }
@@ -52,7 +50,7 @@ const Flag = styled.div<any>`
   width: 100px;
   pointer-events: none;
 `
-export const GameScreen = (props: gameScreenProps) => {
+const GameScreen = () => {
   const [coords, setCoords] = useState({ x: 0, y: 0 })
   const [visibity, setVisibity] = useState('hidden')
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false)
@@ -149,7 +147,7 @@ export const GameScreen = (props: gameScreenProps) => {
         }}
         onMouseLeave={(e) => handleVisibility(e)}
         showMouse={handleMouse()}>
-        <img src={props.imageURL}></img>
+        <img src={imageUrl}></img>
         {dropdownIsOpen ? (
           <CharSelector
             handleDropdownClick={handleDropdownClick}
@@ -176,3 +174,5 @@ export const GameScreen = (props: gameScreenProps) => {
     </>
   )
 }
+
+export default GameScreen

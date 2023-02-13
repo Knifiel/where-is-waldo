@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { reset } from '../../redux/gameSlice'
 import { useAppDispatch, useAppSelector } from '../../redux/hooks'
-import { firestore } from '../../firebase/firebaseConfig'
-import { addDoc, collection } from '@firebase/firestore'
 import { useNavigate } from 'react-router-dom'
 import { millisecondsToTime } from '../../helpers/millisecondsToTime'
 import { addHighscore } from '../../firebase/apiCalls'
@@ -39,6 +37,7 @@ const GameEnd = () => {
     try {
       setIsSending(true)
       await addHighscore(docData)
+      dispatch(reset())
       navigate('/highscores')
     } catch (e) {
       setIsSending(false)

@@ -7,7 +7,7 @@ import {
   getDocs,
   where,
   addDoc,
-} from '@firebase/firestore'
+} from '@firebase/firestore/lite'
 
 export const getHighscores = async () => {
   const q = query(

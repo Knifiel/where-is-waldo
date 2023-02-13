@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
   createRoutesFromElements,
-  Outlet,
   RouterProvider,
   Route,
 } from 'react-router-dom'
@@ -11,12 +10,12 @@ import './index.css'
 import { Provider } from 'react-redux'
 import store from './redux/store'
 import { StyledNotFound } from './routes/NotFound'
-import Game from './routes/Game'
 import { ThemeProvider } from 'styled-components'
 import { theme } from './theme'
 import Root from './routes/Root'
 import Highscores from './features/highscores/Highscores'
 import Instructions from './features/instructions/Instructions'
+import Game from './routes/Game'
 
 const router = createBrowserRouter(
   createRoutesFromElements(

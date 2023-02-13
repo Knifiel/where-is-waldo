@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
-import { useAppDispatch } from '../redux/hooks'
-import { reset } from '../redux/gameSlice'
+import { Outlet } from 'react-router-dom'
 import Navbar from './Navbar'
 
 const Root = () => {
